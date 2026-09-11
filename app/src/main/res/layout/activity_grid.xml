@@ -2,22 +2,21 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1020">
+    android:background="#0B0D1C">
 
-    <!-- Camera sits behind the game so you can see yourself, dimmed down so the
-         bricks stay readable. -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Dimmed so the player can see themselves without the game losing contrast. -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A6000000" />
+        android:background="#B3000000" />
 
-    <com.example.stacker.GameView
-        android:id="@+id/gameView"
+    <com.example.arcade.games.ReactionGridView
+        android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -25,22 +24,11 @@
         android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="48dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="26dp"
         android:padding="8dp"
         android:background="#80000000"
         android:textColor="#FFFFFF"
         android:textSize="13sp"
         android:text="Starting…" />
-
-    <Button
-        android:id="@+id/resetButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="44dp"
-        android:text="Reset" />
-
 </FrameLayout>

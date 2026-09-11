@@ -1,4 +1,4 @@
-package com.example.stacker
+package com.example.arcade.games
 
 import com.example.posekit.Landmark
 import android.content.Context
@@ -18,7 +18,7 @@ import kotlin.math.max
  * model, so "grabbing" is expressed as holding the palm still over a target for
  * [DWELL_MS]. The same gesture drops it again.
  */
-class GameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+class StackerGameView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
 
     private data class Brick(
         val id: Int,

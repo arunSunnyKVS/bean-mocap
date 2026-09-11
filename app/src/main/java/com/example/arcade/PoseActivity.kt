@@ -1,8 +1,9 @@
-package com.example.mocapdemo
+package com.example.arcade
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -10,18 +11,36 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import com.example.posekit.PoseAnalyzer
 import com.example.posekit.PoseResult
-import com.example.mocapdemo.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity() {
+/**
+ * Camera + pose plumbing shared by every screen in the arcade.
+ *
+ * Subclasses provide the [PreviewView] to render into and receive results via
+ * [onPose], which is called on **MediaPipe's thread** — marshal to the UI thread
+ * before touching views.
+ */
+abstract class PoseActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
     private lateinit var cameraExecutor: ExecutorService
     private var poseAnalyzer: PoseAnalyzer? = null
+
+    protected abstract fun previewView(): PreviewView?
+
+    /** Called on MediaPipe's callback thread, not the main thread. */
+    protected abstract fun onPose(result: PoseResult)
+
+    /** Surfaced to the user; default is a toast so subclasses needn't override. */
+    protected open fun onPoseError(message: String) {
+        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
+    }
+
+    protected open fun onCameraReady() {}
 
     private val requestCamera = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -30,17 +49,20 @@ class MainActivity : AppCompatActivity() {
             startCamera()
         } else {
             Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show()
-            binding.statusText.text = "Camera permission denied"
+            finish()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
+        // The player is across the room, not touching the phone, so the normal
+        // idle timeout would blank the screen mid-game.
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
 
+    /** Subclasses call this once their layout is inflated. */
+    protected fun ensureCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
@@ -56,16 +78,14 @@ class MainActivity : AppCompatActivity() {
         providerFuture.addListener({
             val cameraProvider = providerFuture.get()
 
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.previewView.surfaceProvider)
+            val preview = Preview.Builder().build().also { p ->
+                previewView()?.let { p.setSurfaceProvider(it.surfaceProvider) }
             }
 
             poseAnalyzer = PoseAnalyzer(
                 context = this,
-                onResult = ::onPoseResult,
-                onError = { message ->
-                    runOnUiThread { binding.statusText.text = message }
-                },
+                onResult = ::onPose,
+                onError = ::onPoseError,
             )
 
             val analysis = ImageAnalysis.Builder()
@@ -82,30 +102,11 @@ class MainActivity : AppCompatActivity() {
                     preview,
                     analysis,
                 )
-                binding.statusText.text = "Camera running — step back so your whole body is visible"
+                onCameraReady()
             } catch (e: Exception) {
-                binding.statusText.text = "Camera bind failed: ${e.message}"
+                onPoseError("Camera bind failed: ${e.message}")
             }
         }, ContextCompat.getMainExecutor(this))
-    }
-
-    private fun onPoseResult(result: PoseResult) {
-        val landmarks = result.landmarks
-        val imageWidth = result.imageWidth
-        val imageHeight = result.imageHeight
-        val inferenceMs = result.inferenceMs
-
-        // MediaPipe's result listener fires on its own thread; views must be touched
-        // from the UI thread.
-        runOnUiThread {
-            binding.overlayView.setResults(landmarks, imageWidth, imageHeight)
-            binding.avatarView.updatePose(landmarks)
-            binding.statusText.text = if (landmarks.isEmpty()) {
-                "No person detected — ${inferenceMs}ms"
-            } else {
-                "Tracking ${landmarks.size} points — ${inferenceMs}ms"
-            }
-        }
     }
 
     override fun onDestroy() {

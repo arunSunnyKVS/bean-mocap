@@ -1,4 +1,4 @@
-package com.example.mocapdemo
+package com.example.arcade
 
 import com.example.posekit.Landmark
 import com.example.posekit.PoseLandmarks

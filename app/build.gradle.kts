@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mocapdemo"
+    namespace = "com.example.arcade"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mocapdemo"
+        applicationId = "com.example.arcade"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
