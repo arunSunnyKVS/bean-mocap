@@ -11,6 +11,8 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import com.example.posekit.PoseAnalyzer
+import com.example.posekit.PoseResult
 import com.example.mocapdemo.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -87,12 +89,12 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun onPoseResult(
-        landmarks: List<Landmark>,
-        imageWidth: Int,
-        imageHeight: Int,
-        inferenceMs: Long,
-    ) {
+    private fun onPoseResult(result: PoseResult) {
+        val landmarks = result.landmarks
+        val imageWidth = result.imageWidth
+        val imageHeight = result.imageHeight
+        val inferenceMs = result.inferenceMs
+
         // MediaPipe's result listener fires on its own thread; views must be touched
         // from the UI thread.
         runOnUiThread {

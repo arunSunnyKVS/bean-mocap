@@ -1,5 +1,6 @@
 package com.example.stacker
 
+import com.example.posekit.Landmark
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color

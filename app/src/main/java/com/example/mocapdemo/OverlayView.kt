@@ -1,5 +1,7 @@
 package com.example.mocapdemo
 
+import com.example.posekit.Landmark
+import com.example.posekit.PoseLandmarks
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -58,7 +60,7 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
         fun py(lm: Landmark) = lm.y * imageHeight * scale + offsetY
 
-        for ((startIdx, endIdx) in PoseAnalyzer.CONNECTIONS) {
+        for ((startIdx, endIdx) in PoseLandmarks.CONNECTIONS) {
             val a = landmarks.getOrNull(startIdx) ?: continue
             val b = landmarks.getOrNull(endIdx) ?: continue
             if (a.visibility < VISIBILITY_THRESHOLD || b.visibility < VISIBILITY_THRESHOLD) continue

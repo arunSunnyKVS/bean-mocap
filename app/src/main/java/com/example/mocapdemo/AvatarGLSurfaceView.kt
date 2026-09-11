@@ -1,5 +1,7 @@
 package com.example.mocapdemo
 
+import com.example.posekit.Landmark
+import com.example.posekit.PoseLandmarks
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -56,7 +58,7 @@ private class AvatarRenderer : GLSurfaceView.Renderer {
     private var smoothed: FloatArray? = null
 
     private var boneBuffer: FloatBuffer =
-        allocFloatBuffer(PoseAnalyzer.CONNECTIONS.size * 2 * 3)
+        allocFloatBuffer(PoseLandmarks.CONNECTIONS.size * 2 * 3)
     private var jointBuffer: FloatBuffer = allocFloatBuffer(LANDMARK_COUNT * 3)
 
     private var boneVertexCount = 0
@@ -173,7 +175,7 @@ private class AvatarRenderer : GLSurfaceView.Renderer {
     private fun buildGeometry(pose: FloatArray) {
         boneBuffer.clear()
         var boneVerts = 0
-        for ((startIdx, endIdx) in PoseAnalyzer.CONNECTIONS) {
+        for ((startIdx, endIdx) in PoseLandmarks.CONNECTIONS) {
             if (startIdx >= LANDMARK_COUNT || endIdx >= LANDMARK_COUNT) continue
             boneBuffer.put(pose[startIdx * 3])
             boneBuffer.put(pose[startIdx * 3 + 1])

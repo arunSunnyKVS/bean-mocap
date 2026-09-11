@@ -14,5 +14,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "MocapDemo"
+include(":posekit")
 include(":app")
 include(":stacker")

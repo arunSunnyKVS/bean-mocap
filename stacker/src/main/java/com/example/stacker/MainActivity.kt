@@ -11,6 +11,9 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import com.example.posekit.PoseAnalyzer
+import com.example.posekit.PoseResult
+import com.example.posekit.PoseLandmarks
 import com.example.stacker.databinding.ActivityMainBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -92,12 +95,12 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun onPoseResult(
-        landmarks: List<Landmark>,
-        imageWidth: Int,
-        imageHeight: Int,
-        inferenceMs: Long,
-    ) {
+    private fun onPoseResult(result: PoseResult) {
+        val landmarks = result.landmarks
+        val imageWidth = result.imageWidth
+        val imageHeight = result.imageHeight
+        val inferenceMs = result.inferenceMs
+
         runOnUiThread {
             val view = binding.gameView
             if (landmarks.isEmpty() || imageWidth == 0) {
@@ -158,8 +161,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val LEFT_WRIST = 15
-        const val RIGHT_WRIST = 16
+        val LEFT_WRIST = PoseLandmarks.LEFT_WRIST
+        val RIGHT_WRIST = PoseLandmarks.RIGHT_WRIST
         const val VISIBILITY_THRESHOLD = 0.5f
 
         /** Heavier smoothing than the mocap view: dwell targets need a steady cursor. */
