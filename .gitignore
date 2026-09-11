@@ -1,13 +1,12 @@
-*.iml
-.gradle
-.idea/
-.kotlin
-.DS_Store
+# Gradle / build
+build/
+.gradle/
 local.properties
-**/build/
-/captures
-.externalNativeBuild
-.cxx
-*.apk
-*.ap_
-*.aab
+
+# Android Studio / IDE
+.idea/
+*.iml
+captures/
+
+# Scratch
+prompt.txt
